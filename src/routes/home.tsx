@@ -10,6 +10,7 @@ export default function Home() {
 
   return (
     <h1>
+      <div>Hello, {auth.currentUser?.displayName}👋</div>
       <button onClick={logOut}>Log Out</button>
     </h1>
   );

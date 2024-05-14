@@ -16,28 +16,23 @@ import {
 } from "../components/auth-components";
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
+import { useForm } from "react-hook-form";
+
+type FormData = {
+  email: string;
+  password: string;
+};
 
 export default function Login() {
   const navigate = useNavigate();
   const [isLoading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { register, handleSubmit } = useForm<FormData>();
   const [error, setError] = useState("");
   const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
 
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {
-      target: { name, value },
-    } = e;
-    if (name === "email") {
-      setEmail(value);
-    } else if (name === "password") {
-      setPassword(value);
-    }
-  };
-
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const onSubmit = async (formData: FormData) => {
+    const { email, password } = formData;
     setError("");
     if (isLoading || email === "" || password === "") return;
     try {
@@ -53,20 +48,18 @@ export default function Login() {
     }
   };
 
-  const resetPassword = async (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const resetPassword = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     setError("");
-    if (isLoading) return;
     setIsForgotPassword(true);
   };
 
-  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleResetPassword = async () => {
     setError("");
-    if (isLoading || email === "") return;
+    if (isLoading || resetEmail.trim() === "") return;
     try {
       setLoading(true);
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, resetEmail.trim());
       setIsForgotPassword(false);
     } catch (e) {
       if (e instanceof FirebaseError) {
@@ -80,47 +73,43 @@ export default function Login() {
   return (
     <Wrapper>
       <Title>Let's Login!</Title>
-      <Form onSubmit={onSubmit}>
+      <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
-          onChange={onChange}
+          {...register("email", { required: true })}
           name="email"
-          value={email}
           placeholder="Email"
           type="email"
-          required
         />
         <Input
-          onChange={onChange}
+          {...register("password", { required: true })}
           name="password"
-          value={password}
           placeholder="Password"
           type="password"
-          required
         />
         <Input type="submit" value={isLoading ? "Loading" : "Log in"} />
       </Form>
-      {error !== "" ? <Error>{error}</Error> : null}
-
-      <a href="#" onClick={resetPassword}>
-        Forgot password &rarr;
-      </a>
-      {isForgotPassword && (
-        <Form onSubmit={handleResetPassword}>
-          <Input
-            onChange={onChange}
-            name="email"
-            value={email}
-            placeholder="Email"
-            type="email"
-            required
-          />
-          <Input
-            type="submit"
-            value={isLoading ? "Sending" : "Send reset email"}
-          />
-        </Form>
-      )}
-
+      {error && <Error>{error}</Error>}
+      <Switcher>
+        Forgot password?
+        <a href="#" onClick={resetPassword}>
+          Reset password &rarr;
+        </a>
+        {isForgotPassword && (
+          <Form>
+            <Input
+              placeholder="Email"
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+            />
+            <Input
+              type="button"
+              value={isLoading ? "Sending" : "Send reset email"}
+              onClick={handleResetPassword}
+            />
+          </Form>
+        )}
+      </Switcher>
       <Switcher>
         Don't have an account? <Link to="/signup">Create one &rarr;</Link>
       </Switcher>

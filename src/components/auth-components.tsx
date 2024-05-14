@@ -34,6 +34,7 @@ export const Input = styled.input`
 `;
 
 export const Error = styled.span`
+  font-size: 12px;
   font-weight: 600;
   color: tomato;
 `;

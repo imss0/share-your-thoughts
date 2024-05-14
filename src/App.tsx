@@ -10,7 +10,7 @@ import reset from "styled-reset";
 import { useEffect, useState } from "react";
 import LoadingScreen from "./components/loading-screen";
 import { auth } from "./firebase";
-import ProtectedRoute from './components/protected-route';
+import ProtectedRoute from "./components/protected-route";
 
 const router = createBrowserRouter([
   {
@@ -47,9 +47,9 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   };
   body {
-    background-color: black;
+    background-color: #1f1f1f;
     color: white;
-    font-family: system-ui;
+    font-family: Consolas,monaco,monospace; 
   }
 `;
 
