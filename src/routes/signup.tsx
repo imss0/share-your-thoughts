@@ -11,6 +11,9 @@ import {
   Input,
   Switcher,
   Error,
+  SocialLoginWrapper,
+  Line,
+  LineWrapper,
 } from "../components/auth-components";
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
@@ -24,11 +27,20 @@ export default function Signup() {
   const [isLoading, setLoading] = useState(false);
   const { register, handleSubmit } = useForm();
   const [firebaseError, setFirebaseError] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const onSubmit = async (formData: FormData) => {
     const { name, email, password } = formData;
     setFirebaseError("");
-    if (isLoading || email === "" || password === "") return;
+
+    if (isLoading || email === "" || password === "" || confirmPassword === "")
+      return;
+
+    if (password !== confirmPassword) {
+      setFirebaseError("Passwords do not match");
+      return;
+    }
+
     try {
       setLoading(true);
       const credentials = await createUserWithEmailAndPassword(
@@ -77,14 +89,32 @@ export default function Signup() {
           placeholder="Password"
           type="password"
         />
+        <Input
+          {...register("confirmPassword", {
+            required: true,
+          })}
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+        />
+
         <Input type="submit" value={isLoading ? "Loading" : "Sign Up"} />
       </Form>
       {firebaseError !== "" ? <Error>{firebaseError}</Error> : null}
       <Switcher>
         Already have an account? <Link to="/login">Log in &rarr;</Link>
       </Switcher>
-      <GithubButton />
-      <GoogleButton />
+      <SocialLoginWrapper>
+        <LineWrapper>
+          <Line />
+          <span>or</span>
+          <Line />
+        </LineWrapper>
+        <GithubButton />
+        <GoogleButton />
+      </SocialLoginWrapper>
     </Wrapper>
   );
 }

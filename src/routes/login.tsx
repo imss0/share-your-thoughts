@@ -13,6 +13,9 @@ import {
   Input,
   Switcher,
   Error,
+  SocialLoginWrapper,
+  LineWrapper,
+  Line,
 } from "../components/auth-components";
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
@@ -113,8 +116,16 @@ export default function Login() {
       <Switcher>
         Don't have an account? <Link to="/signup">Create one &rarr;</Link>
       </Switcher>
-      <GithubButton />
-      <GoogleButton />
+
+      <SocialLoginWrapper>
+        <LineWrapper>
+          <Line />
+          <span>or</span>
+          <Line />
+        </LineWrapper>
+        <GithubButton />
+        <GoogleButton />
+      </SocialLoginWrapper>
     </Wrapper>
   );
 }

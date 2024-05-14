@@ -17,7 +17,7 @@ export default function GoogleButton() {
   return (
     <Button onClick={onClick}>
       <Logo src="/google-color-icon.webp" />
-      Continue with Google account
+      <span>Continue with Google</span>
     </Button>
   );
 }
