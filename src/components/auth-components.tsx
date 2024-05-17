@@ -39,7 +39,8 @@ export const Input = styled.input`
   background-color: transparent;
   color: black;
   border-width: 0 0 1px;
-  width: 100%;
+  width: 88%;
+  align-self: center;
   font-size: 14px;
   font-family: "Nunito", sans-serif;
   &[type="submit"],

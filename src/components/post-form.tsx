@@ -8,49 +8,57 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 const TextArea = styled.textarea`
   border: 1px solid white;
   padding: 20px;
-  border-radius: 5px;
+  border-radius: 20px;
   font-size: 12px;
-  color: white;
-  background-color: black;
+  color: black;
+  background-color: #fff7d8;
   width: 100%;
   resize: none;
+  font-family: "Nunito", sans-serif;
   &::placeholder {
-    font-size: 10px;
+    font-size: 12px;
   }
   &:focus {
     outline: none;
-    border-color: lightgreen;
   }
 `;
 const AttachFileBtn = styled.label`
   padding: 6px;
-  color: hotpink;
+  color: #ecc64d;
   text-align: center;
-  border-radius: 5px;
-  border: 1px solid hotpink;
+  border-radius: 20px;
+  width: 130px;
+  border: 1px solid #ecc64d;
   font-size: 14px;
   height: 30px;
   font-weight: 600;
+  font-family: "Nunito", sans-serif;
   cursor: pointer;
 `;
 const AttachFileInput = styled.input`
   display: none;
 `;
 const SubmitBtn = styled.input`
-  background-color: hotpink;
+  background-color: #ecc64d;
   color: white;
   border: none;
   padding: 6px;
-  border-radius: 5px;
+  border-radius: 20px;
   font-size: 14px;
   height: 30px;
+  width: 150px;
   font-weight: 600;
-  font-family: Consolas, monaco, monospace;
+  font-family: "Nunito", sans-serif;
   cursor: pointer;
   &:hover,
   &:active {
     opacity: 0.9;
   }
+`;
+
+const BtnContainer = styled.div`
+  display: flex;
+  gap: 10px;
 `;
 
 export default function PostForm() {
@@ -105,20 +113,22 @@ export default function PostForm() {
       <TextArea
         onChange={onChange}
         value={tweet}
-        placeholder="What is happening"
+        placeholder="Share your thoughts..."
         rows={5}
-        maxLength={200}
+        maxLength={400}
       />
-      <AttachFileBtn htmlFor="file">
-        {file ? "Photo added" : "Add photo"}
-      </AttachFileBtn>
-      <AttachFileInput
-        onChange={onFileChange}
-        type="file"
-        id="file"
-        accept="image/*"
-      />
-      <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post"} />
+      <BtnContainer>
+        <AttachFileBtn htmlFor="file">
+          {file ? "Photo added" : "Add photo"}
+        </AttachFileBtn>
+        <AttachFileInput
+          onChange={onFileChange}
+          type="file"
+          id="file"
+          accept="image/*"
+        />
+        <SubmitBtn type="submit" value={isLoading ? "Posting..." : "Post"} />
+      </BtnContainer>
     </Form>
   );
 }

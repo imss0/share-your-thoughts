@@ -3,6 +3,7 @@ import { IPost } from "./timeline";
 import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
+import dayjs from "dayjs";
 
 const Wrapper = styled.div`
   display: grid;
@@ -44,6 +45,7 @@ export default function Post({
   username,
   attachment,
   content,
+  createdAt,
 }: IPost) {
   const user = auth.currentUser;
   const onDelete = async () => {
@@ -64,6 +66,7 @@ export default function Post({
     <Wrapper>
       <Column>
         <Username>{username}</Username>
+        <TextContent>{dayjs(createdAt).format()} </TextContent>
         <TextContent>{content}</TextContent>
         {user?.uid === userId ? (
           <DeleteBtn onClick={onDelete}>delete</DeleteBtn>
