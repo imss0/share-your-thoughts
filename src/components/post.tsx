@@ -59,6 +59,7 @@ export default function Post({
       console.error(e);
     }
   };
+
   return (
     <Wrapper>
       <Column>

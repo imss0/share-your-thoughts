@@ -1,17 +1,29 @@
 import { styled } from "styled-components";
 
+interface ButtonProps {
+  bgColor?: string;
+}
+
 export const Wrapper = styled.div`
   height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 60vw;
+  width: 60%;
   padding: 50px 0px;
 `;
 
 export const Title = styled.div`
-  font-size: 18px;
-  color: #bf82ba;
+  font-size: 28px;
+  color: #ecc64d;
+  font-family: "Poetsen One", sans-serif;
+`;
+
+export const MainText = styled.div`
+  font-size: 24px;
+  font-weight: 700;
+  margin-top: 50px;
+  margin-bottom: 20px;
 `;
 
 export const Form = styled.form`
@@ -23,21 +35,36 @@ export const Form = styled.form`
   width: 100%;
 `;
 export const Input = styled.input`
-  padding: 10px 20px;
+  padding: 10px;
   background-color: transparent;
-  color: #9bdbfe;
+  color: black;
   border-width: 0 0 1px;
   width: 100%;
   font-size: 14px;
-  font-family: Consolas, monaco, monospace;
-  &[type="submit"] {
-    border: 1px solid darkgray;
-    border-radius: 10px;
-    cursor: pointer-events;
+  font-family: "Nunito", sans-serif;
+  &[type="submit"],
+  &[type="button"] {
+    background-color: #ecc64d;
+    text-align: center;
+    font-weight: 600;
+    margin-top: 12px;
+    cursor: pointer;
     &:hover {
-      background-color: #9bdbfe;
-      color: #1f1f1f;
+      opacity: 0.7;
+      font-weight: 800;
     }
+    width: 260px;
+    color: white;
+    padding: 7px 5px;
+    border-radius: 20px;
+    border: 0;
+    font-size: 15px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
   }
 `;
 
@@ -49,28 +76,31 @@ export const Error = styled.span`
 export const Switcher = styled.span`
   margin-top: 20px;
   a {
-    color: lightblue;
+    color: darkgray;
+    margin-left: 10px;
+    text-decoration: none;
   }
 `;
 
-export const Button = styled.span`
-  background-color: white;
+export const Button = styled.span<ButtonProps>`
+  background-color: ${(props) => props.bgColor || "#ecc64d"};
   text-align: center;
-  font-weight: 500;
-  margin-top: 10px;
+  font-weight: 600;
+  margin-top: 12px;
   cursor: pointer;
   &:hover {
-    background-color: darkgray;
+    opacity: 0.7;
     font-weight: 800;
   }
-  width: 50%;
-  color: black;
-  padding: 5px;
-  border-radius: 10px;
+  width: 260px;
+  color: white;
+  padding: 7px 5px;
+  border-radius: 20px;
   border: 0;
+  font-size: 15px;
   display: flex;
-  flex-direction: column;
-  gap: 5px;
+  flex-direction: row;
+  gap: 10px;
   align-items: center;
   justify-content: center;
 `;
@@ -94,11 +124,11 @@ export const LineWrapper = styled.div`
   display: flex;
   gap: 10;
   height: 0px;
-  margin-bottom: 20px;
+  margin-top: 30px;
 `;
 
 export const Line = styled.hr`
-  width: 45%;
+  width: 35%;
   height: 0;
   color: gray;
 `;

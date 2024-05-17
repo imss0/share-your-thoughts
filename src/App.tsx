@@ -47,14 +47,15 @@ const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
   };
   body {
-    background-color: #1f1f1f;
-    color: white;
-    font-family: Consolas,monaco,monospace; 
+    background-color: #fffeff;
+    color: #2a282b;
+    font-family: "Nunito", sans-serif;
   }
 `;
 
 const Wrapper = styled.div`
   height: 100vh;
+  width: 100%;
   display: flex;
   justify-content: center;
 `;

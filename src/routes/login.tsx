@@ -16,6 +16,7 @@ import {
   SocialLoginWrapper,
   LineWrapper,
   Line,
+  MainText,
 } from "../components/auth-components";
 import GithubButton from "../components/github-btn";
 import GoogleButton from "../components/google-btn";
@@ -75,7 +76,17 @@ export default function Login() {
 
   return (
     <Wrapper>
-      <Title>Let's Login!</Title>
+      <Title>Speak up!</Title>
+      <MainText>Welcome! How do you want to get started?</MainText>
+      <SocialLoginWrapper>
+        <GithubButton />
+        <GoogleButton />
+      </SocialLoginWrapper>
+      <LineWrapper>
+        <Line />
+        <span>or</span>
+        <Line />
+      </LineWrapper>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
           {...register("email", { required: true })}
@@ -116,16 +127,6 @@ export default function Login() {
       <Switcher>
         Don't have an account? <Link to="/signup">Create one &rarr;</Link>
       </Switcher>
-
-      <SocialLoginWrapper>
-        <LineWrapper>
-          <Line />
-          <span>or</span>
-          <Line />
-        </LineWrapper>
-        <GithubButton />
-        <GoogleButton />
-      </SocialLoginWrapper>
     </Wrapper>
   );
 }

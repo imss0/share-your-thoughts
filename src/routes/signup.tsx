@@ -63,7 +63,16 @@ export default function Signup() {
 
   return (
     <Wrapper>
-      <Title>Join Share My Thoughts</Title>
+      <Title>Join us with...</Title>
+      <SocialLoginWrapper>
+        <GithubButton />
+        <GoogleButton />
+      </SocialLoginWrapper>
+      <LineWrapper>
+        <Line />
+        <span>or Email 💌 </span>
+        <Line />
+      </LineWrapper>
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Input
           {...register("name", {
@@ -106,15 +115,6 @@ export default function Signup() {
       <Switcher>
         Already have an account? <Link to="/login">Log in &rarr;</Link>
       </Switcher>
-      <SocialLoginWrapper>
-        <LineWrapper>
-          <Line />
-          <span>or</span>
-          <Line />
-        </LineWrapper>
-        <GithubButton />
-        <GoogleButton />
-      </SocialLoginWrapper>
     </Wrapper>
   );
 }
