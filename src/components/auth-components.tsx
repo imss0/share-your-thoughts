@@ -5,9 +5,10 @@ export const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 380px;
+  width: 60vw;
   padding: 50px 0px;
 `;
+
 export const Title = styled.div`
   font-size: 18px;
   color: #bf82ba;
