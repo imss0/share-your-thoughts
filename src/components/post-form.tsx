@@ -82,7 +82,7 @@ export default function PostForm() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (isLoading || !user || tweet === "" || tweet.length > 200) return;
+    if (isLoading || !user || tweet === "" || tweet.length > 400) return;
     try {
       setLoading(true);
       const doc = await addDoc(collection(db, "posts"), {
