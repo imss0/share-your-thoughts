@@ -88,6 +88,8 @@ export default function PostForm() {
       const doc = await addDoc(collection(db, "posts"), {
         content: tweet,
         createdAt: Date.now(),
+        edited: false,
+        editedAt: null,
         username: user.displayName || "noname",
         userId: user.uid,
       });

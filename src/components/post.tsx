@@ -4,10 +4,12 @@ import { auth, db, storage } from "../firebase";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { deleteObject, ref } from "firebase/storage";
 import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 import { useState } from "react";
 
+dayjs.extend(relativeTime);
 interface ColorProps {
-  bgColor?: string;
+  bgcolor?: string;
 }
 
 const Wrapper = styled.div<ColorProps>`
@@ -15,7 +17,7 @@ const Wrapper = styled.div<ColorProps>`
   grid-template-columns: 3fr 1fr;
   padding: 20px;
   border: 1.5px solid;
-  border-color: ${(props) => props.bgColor || "#ecc64d"};
+  border-color: ${(props) => props.bgcolor || "#ecc64d"};
   border-radius: 15px;
   position: relative;
   min-height: 160px;
@@ -24,6 +26,12 @@ const Column = styled.div``;
 const Username = styled.div`
   font-weight: 600;
   font-size: 15px;
+`;
+
+const Time = styled.span`
+  margin: 10px 0px;
+  font-size: 12px;
+  color: gray;
 `;
 const TextContent = styled.p`
   margin: 10px 0px;
@@ -36,7 +44,7 @@ const Photo = styled.img`
 `;
 
 const Btn = styled.button<ColorProps>`
-  background-color: ${(props) => props.bgColor || "#ecc64d"};
+  background-color: ${(props) => props.bgcolor || "#ecc64d"};
   color: white;
   font-weight: 600;
   font-family: "Nunito", sans-serif;
@@ -73,6 +81,12 @@ const BtnContainer = styled.div`
 
 export const Form = styled.form``;
 
+export const NameContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+`;
+
 export default function Post({
   id,
   userId,
@@ -80,11 +94,14 @@ export default function Post({
   attachment,
   content,
   createdAt,
+  editedAt,
+  edited,
 }: IPost) {
   const [editMode, setEditMode] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [isLoading, setLoading] = useState(false);
   const user = auth.currentUser;
+  console.log({ content, editedAt, edited });
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this post?");
     if (!ok || user?.uid !== userId) return;
@@ -115,11 +132,14 @@ export default function Post({
   const onSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (isLoading || editedContent.length > 400) return;
+    const currentTimestamp = Date.now();
     try {
       setLoading(true);
       const docRef = doc(db, "posts", id);
       await updateDoc(docRef, {
         content: editedContent,
+        editedAt: currentTimestamp,
+        edited: true,
       });
     } catch (e) {
       console.error(e);
@@ -130,10 +150,13 @@ export default function Post({
   };
 
   return (
-    <Wrapper bgColor={editMode ? "#ecc64d" : "#dddddd"}>
+    <Wrapper bgcolor={editMode ? "#ecc64d" : "#dddddd"}>
       <Column>
-        <Username>{username}</Username>
-        <TextContent>{dayjs(createdAt).format()} </TextContent>
+        <NameContainer>
+          <Username>{username}</Username>
+          <Time>{dayjs(createdAt).fromNow()} </Time>
+          {edited ? <Time>(edited {dayjs(editedAt).fromNow()})</Time> : null}
+        </NameContainer>
         {editMode ? (
           <TextInput
             onChange={onChange}
@@ -146,19 +169,19 @@ export default function Post({
         )}
         <BtnContainer>
           {user?.uid === userId && !editMode ? (
-            <Btn onClick={onDelete} bgColor="tomato">
+            <Btn onClick={onDelete} bgcolor="tomato">
               delete
             </Btn>
           ) : null}
           {user?.uid === userId && !editMode ? (
-            <Btn onClick={onEdit} bgColor="#1e98f9">
+            <Btn onClick={onEdit} bgcolor="#1e98f9">
               edit
             </Btn>
           ) : null}
           {user?.uid === userId && editMode ? (
             <Form onSubmit={onSave}>
               <Btn type="submit" value="Save">
-                save
+                {isLoading ? "saving..." : "save"}
               </Btn>
             </Form>
           ) : null}

@@ -1,7 +1,7 @@
 import { styled } from "styled-components";
 
 interface ButtonProps {
-  bgColor?: string;
+  bgcolor?: string;
 }
 
 export const Wrapper = styled.div`
@@ -84,7 +84,7 @@ export const Switcher = styled.span`
 `;
 
 export const Button = styled.span<ButtonProps>`
-  background-color: ${(props) => props.bgColor || "#ecc64d"};
+  background-color: ${(props) => props.bgcolor || "#ecc64d"};
   text-align: center;
   font-weight: 600;
   margin-top: 12px;

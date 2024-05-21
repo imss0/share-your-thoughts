@@ -15,7 +15,7 @@ export default function GoogleButton() {
     }
   };
   return (
-    <Button onClick={onClick} bgColor="#a49ca3">
+    <Button onClick={onClick} bgcolor="#a49ca3">
       <Logo src="/google-color-icon.webp" />
       <span>Continue with Google</span>
     </Button>

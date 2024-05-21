@@ -18,6 +18,8 @@ export interface IPost {
   userId: string;
   username: string;
   createdAt: number;
+  edited: boolean;
+  editedAt?: number;
 }
 
 const Wrapper = styled.div`
@@ -40,8 +42,15 @@ export default function Timeline() {
       );
       unsubcribe = await onSnapshot(postsQuery, (snapshot) => {
         const queryResult = snapshot.docs.map((doc) => {
-          const { attachment, content, userId, username, createdAt } =
-            doc.data();
+          const {
+            attachment,
+            content,
+            userId,
+            username,
+            createdAt,
+            edited,
+            editedAt,
+          } = doc.data();
           return {
             id: doc.id,
             attachment,
@@ -49,6 +58,8 @@ export default function Timeline() {
             userId,
             username,
             createdAt,
+            edited,
+            editedAt,
           };
         });
         setPosts(queryResult);
