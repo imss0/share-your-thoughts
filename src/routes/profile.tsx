@@ -5,6 +5,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Unsubscribe, updateProfile } from "firebase/auth";
 import {
   collection,
+  doc,
   limit,
   onSnapshot,
   orderBy,
@@ -13,6 +14,7 @@ import {
 } from "firebase/firestore";
 import { IPost } from "../components/timeline";
 import Post from "../components/post";
+import { useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
   display: flex;
@@ -55,9 +57,13 @@ const Posts = styled.div`
 `;
 
 export default function Profile() {
+  const { profileUserId } = useParams();
+  const [userData, setUserData] = useState({});
+
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [posts, setPosts] = useState<IPost[]>([]);
+
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     if (!user) return;
@@ -75,10 +81,23 @@ export default function Profile() {
 
   useEffect(() => {
     let unsubcribe: Unsubscribe | null;
+    let unsubscribeProfile: Unsubscribe | null;
+
+    const fetchUserData = async () => {
+      // const userRef = doc(db, "users", profileUserId);
+      const userQuery = query(
+        collection(db, "users"),
+        where("userId", "==", profileUserId)
+      );
+      unsubscribeProfile = onSnapshot(userQuery, async (snapshot) => {
+        const userData = snapshot.docs.map(async (doc) => doc.data());
+        setUserData(userData);
+      });
+    };
     const fetchPosts = async () => {
       const postsQuery = query(
         collection(db, "posts"),
-        where("userId", "==", user?.uid),
+        where("userId", "==", profileUserId),
         orderBy("createdAt", "desc"),
         limit(30)
       );
@@ -107,28 +126,35 @@ export default function Profile() {
         setPosts(queryResult);
       });
     };
+    fetchUserData();
     fetchPosts();
     return () => {
+      unsubscribeProfile && unsubscribeProfile();
       unsubcribe && unsubcribe();
     };
-  }, []);
+  }, [profileUserId]);
 
   return (
     <Wrapper>
-      <AvatarUpload htmlFor="avatar">
-        {avatar ? (
-          <AvatarImg src={avatar} />
-        ) : (
-          <i className="fa-solid fa-user"></i>
-        )}
-      </AvatarUpload>
-      <AvatarInput
-        onChange={onChange}
-        id="avatar"
-        type="file"
-        accept="image/*"
-      />
-      <Name>{user?.displayName ?? "noname"}</Name>
+      {user?.uid === profileUserId ? (
+        <>
+          <AvatarUpload htmlFor="avatar">
+            {avatar ? (
+              <AvatarImg src={avatar} />
+            ) : (
+              <i className="fa-solid fa-user"></i>
+            )}
+          </AvatarUpload>
+          <AvatarInput
+            onChange={onChange}
+            id="avatar"
+            type="file"
+            accept="image/*"
+          />
+          <Name>{user?.displayName ?? "noname"}</Name>
+        </>
+      ) : null}
+
       <Posts>
         {posts.map((post) => (
           <Post key={post.id} {...post} />

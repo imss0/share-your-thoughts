@@ -49,7 +49,7 @@ export default function Layout() {
             <i className="fa-solid fa-house-chimney"></i>
           </MenuItem>
         </Link>
-        <Link to="/profile">
+        <Link to={`/profile/${auth.currentUser?.uid}`}>
           <MenuItem>
             {" "}
             <i className="fa-solid fa-user"></i>

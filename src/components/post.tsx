@@ -6,6 +6,7 @@ import { deleteObject, ref } from "firebase/storage";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 dayjs.extend(relativeTime);
 interface ColorProps {
@@ -20,7 +21,6 @@ const Wrapper = styled.div<ColorProps>`
   border-color: ${(props) => props.bgcolor || "#ecc64d"};
   border-radius: 15px;
   position: relative;
-  min-height: 160px;
 `;
 const Column = styled.div``;
 const Username = styled.div`
@@ -38,9 +38,8 @@ const TextContent = styled.p`
   font-size: 14px;
 `;
 const Photo = styled.img`
-  width: 100px;
-  height: 100px;
-  border-radius: 15px;
+  width: 200px;
+  height: 200px;
 `;
 
 const Btn = styled.button<ColorProps>`
@@ -87,6 +86,12 @@ export const NameContainer = styled.div`
   gap: 10px;
 `;
 
+const AvatarImg = styled.img`
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+`;
+
 export default function Post({
   id,
   userId,
@@ -96,12 +101,12 @@ export default function Post({
   createdAt,
   editedAt,
   edited,
+  avatar,
 }: IPost) {
   const [editMode, setEditMode] = useState(false);
   const [editedContent, setEditedContent] = useState(content);
   const [isLoading, setLoading] = useState(false);
   const user = auth.currentUser;
-  console.log({ content, editedAt, edited });
   const onDelete = async () => {
     const ok = confirm("Are you sure you want to delete this post?");
     if (!ok || user?.uid !== userId) return;
@@ -153,10 +158,20 @@ export default function Post({
     <Wrapper bgcolor={editMode ? "#ecc64d" : "#dddddd"}>
       <Column>
         <NameContainer>
+          {avatar ? (
+            <Link to={`profile/${userId}`}>
+              <AvatarImg src={avatar} />
+            </Link>
+          ) : (
+            <Link to={`profile/${userId}`}>
+              <i className="fa-solid fa-user"></i>
+            </Link>
+          )}
           <Username>{username}</Username>
           <Time>{dayjs(createdAt).fromNow()} </Time>
           {edited ? <Time>(edited {dayjs(editedAt).fromNow()})</Time> : null}
         </NameContainer>
+        {attachment ? <Photo src={attachment} /> : null}
         {editMode ? (
           <TextInput
             onChange={onChange}
@@ -187,8 +202,6 @@ export default function Post({
           ) : null}
         </BtnContainer>
       </Column>
-
-      <Column>{attachment ? <Photo src={attachment} /> : null}</Column>
     </Wrapper>
   );
 }

@@ -1,7 +1,8 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { auth } from "../firebase";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
+import { auth, db, storage } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import {
@@ -50,6 +51,13 @@ export default function Signup() {
       );
       await updateProfile(credentials.user, {
         displayName: name,
+      });
+      await addDoc(collection(db, "users"), {
+        name,
+        createdAt: Date.now(),
+        edited: false,
+        username: credentials.user.displayName || "noname",
+        userId: credentials.user.uid,
       });
       navigate("/");
     } catch (e) {
