@@ -51,7 +51,7 @@ export const Btn = styled.button<ColorProps>`
   font-size: 14px;
   text-transform: uppercase;
   border-radius: 20px;
-  width: 80px;
+  min-width: 80px;
   height: 30px;
   margin: 2px;
   cursor: pointer;

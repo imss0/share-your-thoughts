@@ -25,6 +25,12 @@ const Wrapper = styled.div`
   overflow-y: scroll;
 `;
 
+const BtnContainer = styled.div`
+  right: 10px;
+  bottom: 8px;
+  display: flex;
+`;
+
 const AvatarUpload = styled.label`
   width: 80px;
   height: 80px;
@@ -80,6 +86,9 @@ export default function Profile() {
   const [posts, setPosts] = useState<IPost[]>([]);
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(username);
+  const [bio, setBio] = useState("");
+  const [editBioMode, setEditBioMode] = useState(false);
+  // const [editedBio, setEditedBio] = useState(bio);
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -126,6 +135,7 @@ export default function Profile() {
       console.error(e);
     } finally {
       setEditMode(false);
+      setEditBioMode(false);
     }
   };
 
@@ -209,6 +219,7 @@ export default function Profile() {
     };
 
     initializeProfile();
+    setBio("Hello World! I'm new here! 🌍");
 
     return () => {
       unsubscribeProfile && unsubscribeProfile();
@@ -234,11 +245,18 @@ export default function Profile() {
             accept="image/*"
           />
           <Name>{user?.displayName ?? "noname"} </Name>
-          {user?.uid === profileUserId && !editMode ? (
-            <Btn onClick={onEdit} bgcolor="#1e98f9">
-              edit
-            </Btn>
-          ) : null}
+          <BtnContainer>
+            {user?.uid === profileUserId && !editMode && !editBioMode ? (
+              <Btn onClick={onEdit} bgcolor="#1e98f9">
+                edit username
+              </Btn>
+            ) : null}
+            {user?.uid === profileUserId && !editMode && !editBioMode ? (
+              <Btn onClick={onEdit} bgcolor="#36e2bd">
+                add bio
+              </Btn>
+            ) : null}
+          </BtnContainer>
           {editMode ? (
             <Form onSubmit={onSave}>
               <NameInput onChange={onChangeText} value={editedName} />
@@ -262,6 +280,7 @@ export default function Profile() {
         </>
       )}
 
+      <div>{bio}</div>
       <Posts>
         {posts.map((post) => (
           <Post key={post.id} {...post} />
