@@ -5,7 +5,6 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Unsubscribe, updateProfile } from "firebase/auth";
 import {
   collection,
-  doc,
   limit,
   onSnapshot,
   orderBy,
@@ -58,10 +57,10 @@ const Posts = styled.div`
 
 export default function Profile() {
   const { profileUserId } = useParams();
-  const [userData, setUserData] = useState({});
+  const [username, setUsername] = useState("");
 
   const user = auth.currentUser;
-  const [avatar, setAvatar] = useState(user?.photoURL);
+  const [avatar, setAvatar] = useState("");
   const [posts, setPosts] = useState<IPost[]>([]);
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,17 +82,34 @@ export default function Profile() {
     let unsubcribe: Unsubscribe | null;
     let unsubscribeProfile: Unsubscribe | null;
 
-    const fetchUserData = async () => {
-      // const userRef = doc(db, "users", profileUserId);
+    const fetchUserInfo = async () => {
       const userQuery = query(
         collection(db, "users"),
         where("userId", "==", profileUserId)
       );
+
       unsubscribeProfile = onSnapshot(userQuery, async (snapshot) => {
-        const userData = snapshot.docs.map(async (doc) => doc.data());
-        setUserData(userData);
+        const userData = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const { username } = doc.data();
+            return username;
+          })
+        );
+        setUsername(userData[0]);
       });
     };
+
+    const fetchAvatarUrl = async (userId: string) => {
+      try {
+        const avatarRef = ref(storage, `avatars/${userId}`);
+        const avatarUrl = await getDownloadURL(avatarRef);
+        return avatarUrl;
+      } catch (e) {
+        console.error("Error fetching avatar URL:", e);
+        return null;
+      }
+    };
+
     const fetchPosts = async () => {
       const postsQuery = query(
         collection(db, "posts"),
@@ -101,33 +117,48 @@ export default function Profile() {
         orderBy("createdAt", "desc"),
         limit(30)
       );
-      unsubcribe = await onSnapshot(postsQuery, (snapshot) => {
-        const queryResult = snapshot.docs.map((doc) => {
-          const {
-            attachment,
-            content,
-            userId,
-            username,
-            createdAt,
-            edited,
-            editedAt,
-          } = doc.data();
-          return {
-            id: doc.id,
-            attachment,
-            content,
-            userId,
-            username,
-            createdAt,
-            edited,
-            editedAt,
-          };
-        });
+      unsubcribe = await onSnapshot(postsQuery, async (snapshot) => {
+        const queryResult = await Promise.all(
+          snapshot.docs.map(async (doc) => {
+            const {
+              attachment,
+              content,
+              userId,
+              username,
+              createdAt,
+              edited,
+              editedAt,
+            } = doc.data();
+
+            const avatar = await fetchAvatarUrl(userId);
+            return {
+              id: doc.id,
+              attachment,
+              content,
+              userId,
+              username,
+              createdAt,
+              edited,
+              editedAt,
+              avatar,
+            };
+          })
+        );
         setPosts(queryResult);
       });
     };
-    fetchUserData();
-    fetchPosts();
+
+    const initializeProfile = async () => {
+      await fetchUserInfo();
+      await fetchPosts();
+      const avatarUrl = await fetchAvatarUrl(profileUserId as string);
+      if (avatarUrl) {
+        setAvatar(avatarUrl);
+      }
+    };
+
+    initializeProfile();
+
     return () => {
       unsubscribeProfile && unsubscribeProfile();
       unsubcribe && unsubcribe();
@@ -153,7 +184,19 @@ export default function Profile() {
           />
           <Name>{user?.displayName ?? "noname"}</Name>
         </>
-      ) : null}
+      ) : (
+        <>
+          {avatar ? (
+            <AvatarUpload>
+              <AvatarImg src={avatar} />
+            </AvatarUpload>
+          ) : (
+            <i className="fa-solid fa-user"></i>
+          )}
+
+          <Name>{username ?? "noname"}</Name>
+        </>
+      )}
 
       <Posts>
         {posts.map((post) => (

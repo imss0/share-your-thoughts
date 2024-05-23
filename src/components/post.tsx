@@ -159,11 +159,11 @@ export default function Post({
       <Column>
         <NameContainer>
           {avatar ? (
-            <Link to={`profile/${userId}`}>
+            <Link to={`/profile/${userId}`}>
               <AvatarImg src={avatar} />
             </Link>
           ) : (
-            <Link to={`profile/${userId}`}>
+            <Link to={`/profile/${userId}`}>
               <i className="fa-solid fa-user"></i>
             </Link>
           )}

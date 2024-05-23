@@ -1,8 +1,8 @@
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { addDoc, collection, updateDoc } from "firebase/firestore";
-import { auth, db, storage } from "../firebase";
+import { addDoc, collection } from "firebase/firestore";
+import { auth, db } from "../firebase";
 import { Link, useNavigate } from "react-router-dom";
 import { FirebaseError } from "firebase/app";
 import {
