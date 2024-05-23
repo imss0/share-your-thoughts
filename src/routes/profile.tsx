@@ -5,14 +5,16 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { Unsubscribe, updateProfile } from "firebase/auth";
 import {
   collection,
+  doc,
   limit,
   onSnapshot,
   orderBy,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { IPost } from "../components/timeline";
-import Post from "../components/post";
+import Post, { Btn } from "../components/post";
 import { useParams } from "react-router-dom";
 
 const Wrapper = styled.div`
@@ -44,8 +46,22 @@ const AvatarImg = styled.img`
 const AvatarInput = styled.input`
   display: none;
 `;
+
 const Name = styled.span`
   font-size: 20px;
+  font-family: "Poetsen One", sans-serif;
+  i {
+    font-size: 12px;
+    margin-left: 10px;
+    color: gray;
+  }
+`;
+const Form = styled.form``;
+const NameInput = styled.input`
+  border: 1px solid #ecc64d;
+  border-radius: 10px;
+  height: 30px;
+  font-family: "nunito", sans-serif;
 `;
 
 const Posts = styled.div`
@@ -62,6 +78,8 @@ export default function Profile() {
   const user = auth.currentUser;
   const [avatar, setAvatar] = useState("");
   const [posts, setPosts] = useState<IPost[]>([]);
+  const [editMode, setEditMode] = useState(false);
+  const [editedName, setEditedName] = useState(username);
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -75,6 +93,39 @@ export default function Profile() {
       await updateProfile(user, {
         photoURL: avatarUrl,
       });
+    }
+  };
+
+  const onChangeText = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEditedName(e.target.value);
+  };
+
+  const onEdit = async () => {
+    if (user?.uid !== profileUserId) return;
+    try {
+      setEditMode(true);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const onSave = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editedName) return;
+    try {
+      const docRef = doc(db, "users", user?.uid as string);
+      await updateDoc(docRef, {
+        username: editedName,
+      });
+      if (user) {
+        await updateProfile(user, {
+          displayName: editedName,
+        });
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setEditMode(false);
     }
   };
 
@@ -182,7 +233,20 @@ export default function Profile() {
             type="file"
             accept="image/*"
           />
-          <Name>{user?.displayName ?? "noname"}</Name>
+          <Name>{user?.displayName ?? "noname"} </Name>
+          {user?.uid === profileUserId && !editMode ? (
+            <Btn onClick={onEdit} bgcolor="#1e98f9">
+              edit
+            </Btn>
+          ) : null}
+          {editMode ? (
+            <Form onSubmit={onSave}>
+              <NameInput onChange={onChangeText} value={editedName} />
+              <Btn type="submit" value="Save">
+                save
+              </Btn>
+            </Form>
+          ) : null}
         </>
       ) : (
         <>

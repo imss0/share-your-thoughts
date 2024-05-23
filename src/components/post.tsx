@@ -42,7 +42,7 @@ const Photo = styled.img`
   height: 200px;
 `;
 
-const Btn = styled.button<ColorProps>`
+export const Btn = styled.button<ColorProps>`
   background-color: ${(props) => props.bgcolor || "#ecc64d"};
   color: white;
   font-weight: 600;
