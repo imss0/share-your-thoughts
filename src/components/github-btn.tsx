@@ -18,7 +18,6 @@ export default function GithubButton() {
         name: user.displayName || "noname",
         createdAt: Date.now(),
         edited: false,
-        username: user.displayName || "noname",
         userId: user.uid,
       });
 

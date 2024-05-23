@@ -6,6 +6,7 @@ import { Unsubscribe, updateProfile } from "firebase/auth";
 import {
   collection,
   doc,
+  getDoc,
   limit,
   onSnapshot,
   orderBy,
@@ -77,6 +78,14 @@ const Posts = styled.div`
   width: 100%;
 `;
 
+const TextInput = styled.textarea`
+  width: 100%;
+  border: 1px solid lightgray;
+  border-radius: 15px;
+  padding: 15px;
+  font-family: "nunito", sans-serif;
+`;
+
 export default function Profile() {
   const { profileUserId } = useParams();
   const [username, setUsername] = useState("");
@@ -87,8 +96,8 @@ export default function Profile() {
   const [editMode, setEditMode] = useState(false);
   const [editedName, setEditedName] = useState(username);
   const [bio, setBio] = useState("");
+  const [editedBio, setEditedbio] = useState(bio);
   const [editBioMode, setEditBioMode] = useState(false);
-  // const [editedBio, setEditedBio] = useState(bio);
 
   const onChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -109,6 +118,10 @@ export default function Profile() {
     setEditedName(e.target.value);
   };
 
+  const onChangeBio = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditedbio(e.target.value);
+  };
+
   const onEdit = async () => {
     if (user?.uid !== profileUserId) return;
     try {
@@ -118,23 +131,59 @@ export default function Profile() {
     }
   };
 
+  const onEditBio = async () => {
+    if (user?.uid !== profileUserId) return;
+    try {
+      setEditBioMode(true);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const onSave = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!editedName) return;
+    console.log(editedName, user);
+
+    if (!editedName || !user) return;
+
+    const docRef = doc(db, "users", user.uid);
+
     try {
-      const docRef = doc(db, "users", user?.uid as string);
+      const docSnap = await getDoc(docRef);
+
+      if (!docSnap.exists()) {
+        console.error(`Document with ID ${user.uid} does not exist`);
+        return;
+      }
+
       await updateDoc(docRef, {
-        username: editedName,
+        name: editedName,
       });
+
       if (user) {
+        console.log({ user });
         await updateProfile(user, {
           displayName: editedName,
         });
       }
     } catch (e) {
-      console.error(e);
+      console.error("Error updating document: ", e);
     } finally {
       setEditMode(false);
+    }
+  };
+
+  const onSaveBio = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!editedBio || !user) return;
+    try {
+      const docRef = doc(db, "users", user.uid);
+      await updateDoc(docRef, {
+        bio: editedBio,
+      });
+    } catch (e) {
+      console.error(e);
+    } finally {
       setEditBioMode(false);
     }
   };
@@ -152,11 +201,12 @@ export default function Profile() {
       unsubscribeProfile = onSnapshot(userQuery, async (snapshot) => {
         const userData = await Promise.all(
           snapshot.docs.map(async (doc) => {
-            const { username } = doc.data();
-            return username;
+            const { name, bio } = doc.data();
+            return { name, bio };
           })
         );
-        setUsername(userData[0]);
+        setUsername(userData[0].name);
+        setBio(userData[0].bio);
       });
     };
 
@@ -219,7 +269,7 @@ export default function Profile() {
     };
 
     initializeProfile();
-    setBio("Hello World! I'm new here! 🌍");
+    setBio(editedBio);
 
     return () => {
       unsubscribeProfile && unsubscribeProfile();
@@ -252,8 +302,8 @@ export default function Profile() {
               </Btn>
             ) : null}
             {user?.uid === profileUserId && !editMode && !editBioMode ? (
-              <Btn onClick={onEdit} bgcolor="#36e2bd">
-                add bio
+              <Btn onClick={onEditBio} bgcolor="#36e2bd">
+                set bio
               </Btn>
             ) : null}
           </BtnContainer>
@@ -280,7 +330,23 @@ export default function Profile() {
         </>
       )}
 
-      <div>{bio}</div>
+      {user?.uid === profileUserId && editBioMode ? (
+        <>
+          <Form onSubmit={onSaveBio}>
+            <TextInput
+              placeholder="Tell me about yourself :)"
+              onChange={onChangeBio}
+              value={editedBio}
+              rows={3}
+              maxLength={400}
+            />
+            <Btn type="submit">save</Btn>
+          </Form>
+        </>
+      ) : (
+        <div>{bio}</div>
+      )}
+
       <Posts>
         {posts.map((post) => (
           <Post key={post.id} {...post} />
